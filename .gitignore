@@ -1,0 +1,93 @@
+## Archivos y carpetas de Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Salidas de compilación
+bin/
+obj/
+out/
+
+## Paquetes NuGet
+*.nupkg
+*.snupkg
+packages/
+# Si usas paquetes NuGet en modo paquete local
+*.nuspec
+
+## Archivos de configuración de usuario
+*.userprefs
+*.user.config
+
+## Archivos de publicación
+publish/
+wwwroot/dist/
+wwwroot/node_modules/
+wwwroot/lib/
+
+## Archivos de dependencias de cliente (Blazor WebAssembly)
+ClientApp/node_modules/
+ClientApp/build/
+ClientApp/dist/
+ClientApp/.angular/
+ClientApp/.cache/
+ClientApp/.next/
+ClientApp/.nuxt/
+ClientApp/.output/
+ClientApp/.svelte-kit/
+ClientApp/.turbo/
+ClientApp/.vite/
+ClientApp/.yarn/
+ClientApp/.pnp.*
+ClientApp/package-lock.json
+ClientApp/yarn.lock
+
+## Archivos de logs
+*.log
+
+## Archivos de base de datos locales
+*.mdf
+*.ldf
+*.db
+*.sqlite
+
+## Archivos de configuración de Rider/JetBrains
+.idea/
+*.sln.iml
+
+## Archivos de test y cobertura
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+## Archivos temporales y del sistema operativo
+*.tmp
+*.temp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Archivos de configuración de Docker
+docker-compose.override.yml
+
+## Archivos de configuración de Azure
+*.azure*
+
+## Archivos de configuración de usuario de IIS/ASP.NET
+*.vspscc
+*.vssscc
+
+## Archivos de configuración de secrets locales
+secrets.json
+
+## Archivos de configuración de launchSettings
+Properties/launchSettings.json
+
+# Fin del .gitignore

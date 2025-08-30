@@ -1,0 +1,77 @@
+﻿<nav class="navbar navbar-expand-lg custom-navbar mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">ERP Granjita</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav gap-4 flex-row">
+                <li class="nav-item">
+                    <NavLink class="nav-link menu-link" href="/" Match="NavLinkMatch.All">Inicio</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link menu-link" href="ventas" Match="NavLinkMatch.Prefix">Ventas</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link menu-link" href="stock" Match="NavLinkMatch.Prefix">Stock</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link menu-link" href="reportes" Match="NavLinkMatch.Prefix">Reportes</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link menu-link" href="clientes" Match="NavLinkMatch.Prefix">Clientes</NavLink>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .custom-navbar {
+        background: linear-gradient(90deg, #e6723a 0%, #c94e3a 100%);
+        border-radius: 0 0 1rem 1rem;
+        box-shadow: 0 2px 10px 0 rgba(200, 100, 50, 0.1);
+    }
+
+    .navbar-brand,
+    .nav-link.menu-link {
+        color: #fff7f0 !important;
+        letter-spacing: 1px;
+        font-size: 1.15rem;
+        padding: 0.7em 2em;
+        border-radius: 0.35rem;
+        background: none !important;
+        border: none;
+        box-sizing: border-box;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .nav-link.menu-link.active,
+        .nav-link.menu-link:focus,
+        .nav-link.menu-link:hover {
+            color: #ffe1c1 !important;
+            background-color: rgba(255, 255, 255, 0.14) !important;
+            text-shadow: none;
+        }
+
+    /* UL: lista horizontal y centrada verticalmente */
+    .navbar .navbar-nav {
+        list-style: none;
+        align-items: center !important;
+    }
+
+    /* LI: flex para alinear los hijos */
+    .navbar .nav-item {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Link: que se comporte como flex (evita que se baje el primero) */
+    .navbar .nav-link.menu-link {
+        display: flex;
+        align-items: center;
+        padding: 0.7em 2em;
+        line-height: 1;
+    }
+</style>

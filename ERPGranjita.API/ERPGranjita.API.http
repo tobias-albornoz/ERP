@@ -1,0 +1,6 @@
+@ERPGranjita.API_HostAddress = http://localhost:5117
+
+GET {{ERPGranjita.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

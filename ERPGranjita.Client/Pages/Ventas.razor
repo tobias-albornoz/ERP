@@ -1,0 +1,126 @@
+@page "/"
+@using ERPGranjita.Shared.Models
+@inject HttpClient Http
+
+<h3>Ventas Diarias</h3>
+
+<EditForm Model="@nuevaVenta" OnValidSubmit="GuardarVenta" class="mb-4">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Fecha</label>
+            <InputDate @bind-Value="nuevaVenta.Fecha" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Balanza</label>
+            <InputNumber @bind-Value="nuevaVenta.NumeroBalanza" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Total Venta</label>
+            <InputNumber @bind-Value="nuevaVenta.TotalVenta" class="form-control" step="0.01" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Tickets</label>
+            <InputNumber @bind-Value="nuevaVenta.Tickets" class="form-control" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                @(isSaving ? "Guardando..." : "Guardar")
+            </button>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-success mt-3">@mensaje</div>
+    }
+    @if (!string.IsNullOrEmpty(errorMensaje))
+    {
+        <div class="alert alert-danger mt-3">@errorMensaje</div>
+    }
+</EditForm>
+
+@if (ventas == null)
+{
+    <div class="text-secondary">Cargando ventas...</div>
+}
+else if (ventas.Count == 0)
+{
+    <div class="alert alert-warning">No hay ventas registradas.</div>
+}
+else
+{
+    <table class="table table-striped table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Balanza</th>
+                <th>Total Venta</th>
+                <th>Tickets</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in ventas)
+            {
+                <tr>
+                    <td>@v.Fecha.ToShortDateString()</td>
+                    <td>@v.NumeroBalanza</td>
+                    <td>@v.TotalVenta.ToString("C")</td>
+                    <td>@v.Tickets</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Venta>? ventas;
+    private Venta nuevaVenta = new Venta { Fecha = DateTime.Today };
+    private bool isSaving = false;
+    private string mensaje = "";
+    private string errorMensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarVentas();
+    }
+
+    private async Task GuardarVenta()
+    {
+        isSaving = true;
+        mensaje = "";
+        errorMensaje = "";
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/ventas", nuevaVenta);
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "Venta guardada correctamente";
+                await CargarVentas();
+                nuevaVenta = new Venta { Fecha = DateTime.Today };
+            }
+            else
+            {
+                errorMensaje = "Error al guardar la venta.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = "Error al conectar con la API: " + ex.Message;
+        }
+        isSaving = false;
+    }
+
+    private async Task CargarVentas()
+    {
+        try
+        {
+            ventas = await Http.GetFromJsonAsync<List<Venta>>("api/ventas");
+        }
+        catch
+        {
+            ventas = new List<Venta>();
+            errorMensaje = "Error al cargar ventas desde la API.";
+        }
+    }
+}
