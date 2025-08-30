@@ -15,4 +15,8 @@
     <ProjectReference Include="..\ERPGranjita.Shared\ERPGranjita.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

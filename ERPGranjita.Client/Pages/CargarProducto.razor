@@ -1,0 +1,47 @@
+@page "/producto"
+@inject HttpClient Http
+
+<h3>Cargar Producto</h3>
+
+<EditForm Model="@producto" OnValidSubmit="GuardarProducto">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <InputText @bind-Value="producto.Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <InputText @bind-Value="producto.Descripcion" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Unidad de Medida</label>
+        <InputText @bind-Value="producto.UnidadMedida" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-success mt-3">@mensaje</div>
+}
+
+@code {
+    private Producto producto = new();
+    private string mensaje = "";
+
+    private async Task GuardarProducto()
+    {
+        var response = await Http.PostAsJsonAsync("api/productos", producto);
+        if (response.IsSuccessStatusCode)
+        {
+            mensaje = "Producto guardado correctamente.";
+            producto = new Producto();
+        }
+        else
+        {
+            mensaje = "Error al guardar el producto.";
+        }
+    }
+}

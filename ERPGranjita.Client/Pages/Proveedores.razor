@@ -1,0 +1,121 @@
+@page "/proveedores"
+@inject HttpClient Http
+
+<h3>Proveedores</h3>
+
+<EditForm Model="@nuevoProveedor" OnValidSubmit="GuardarProveedor" class="mb-4">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <InputText @bind-Value="nuevoProveedor.Nombre" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Contacto</label>
+            <InputText @bind-Value="nuevoProveedor.Contacto" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Teléfono</label>
+            <InputText @bind-Value="nuevoProveedor.Telefono" class="form-control" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                @(isSaving ? "Guardando..." : "Guardar")
+            </button>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-success mt-3">@mensaje</div>
+    }
+    @if (!string.IsNullOrEmpty(errorMensaje))
+    {
+        <div class="alert alert-danger mt-3">@errorMensaje</div>
+    }
+</EditForm>
+
+@if (proveedores == null)
+{
+    <div class="text-secondary">Cargando proveedores...</div>
+}
+else if (proveedores.Count == 0)
+{
+    <div class="alert alert-warning">No hay proveedores registrados.</div>
+}
+else
+{
+    <table class="table table-striped table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Teléfono</th>
+                <th>Compras</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in proveedores)
+            {
+                <tr>
+                    <td>@p.Nombre</td>
+                    <td>@p.Contacto</td>
+                    <td>@p.Telefono</td>
+                    <td>@p.Compras?.Count ?? 0</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ERPGranjita.Shared.Models.Proveedor>? proveedores;
+    private ERPGranjita.Shared.Models.Proveedor nuevoProveedor = new();
+    private bool isSaving = false;
+    private string mensaje = "";
+    private string errorMensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarProveedores();
+    }
+
+    private async Task GuardarProveedor()
+    {
+        isSaving = true;
+        mensaje = "";
+        errorMensaje = "";
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/proveedores", nuevoProveedor);
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "Proveedor guardado correctamente";
+                await CargarProveedores();
+                nuevoProveedor = new();
+            }
+            else
+            {
+                errorMensaje = "Error al guardar el proveedor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = "Error al conectar con la API: " + ex.Message;
+        }
+        isSaving = false;
+    }
+
+    private async Task CargarProveedores()
+    {
+        try
+        {
+            proveedores = await Http.GetFromJsonAsync<List<ERPGranjita.Shared.Models.Proveedor>>("api/proveedores");
+        }
+        catch
+        {
+            proveedores = new List<ERPGranjita.Shared.Models.Proveedor>();
+            errorMensaje = "Error al cargar proveedores desde la API.";
+        }
+    }
+}

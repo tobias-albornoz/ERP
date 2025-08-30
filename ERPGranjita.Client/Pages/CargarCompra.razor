@@ -1,0 +1,55 @@
+@page "/compra"
+@inject HttpClient Http
+
+<h3>Cargar Compra de Producto</h3>
+
+<EditForm Model="@compra" OnValidSubmit="GuardarCompra">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Proveedor</label>
+        <InputSelect @bind-Value="compra.ProveedorId" class="form-control">
+            <option value="">Seleccione un proveedor</option>
+            @foreach (var proveedor in proveedores)
+            {
+                <option value="@proveedor.Id">@proveedor.Nombre</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="mb-3">
+        <label>Producto</label>
+        <InputNumber @bind-Value="compra.ProductoId" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Cantidad</label>
+        <InputNumber @bind-Value="compra.Cantidad" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Precio Unitario</label>
+        <InputNumber @bind-Value="compra.PrecioUnitario" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Fecha</label>
+        <InputDate @bind-Value="compra.Fecha" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    private CompraProducto compra = new();
+    private List<Proveedor> proveedores = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetFromJsonAsync<List<Proveedor>>("api/proveedores");
+        proveedores = result ?? new List<Proveedor>();
+        compra.Fecha = DateTime.Now;
+    }
+
+    private async Task GuardarCompra()
+    {
+        await Http.PostAsJsonAsync("api/compras", compra);
+        compra = new CompraProducto { Fecha = DateTime.Now };
+    }
+}
