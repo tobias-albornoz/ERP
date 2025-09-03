@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERPGranjita.Client", "ERPGr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERPGranjita.Shared", "ERPGranjita.Shared\ERPGranjita.Shared.csproj", "{0FB5D33A-B097-4317-8815-11241F86606E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentacion", "Documentacion", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		tablas_Egreso.sql = tablas_Egreso.sql
+		tablas_Ingreso.sql = tablas_Ingreso.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
