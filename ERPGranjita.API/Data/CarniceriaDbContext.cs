@@ -13,6 +13,8 @@ namespace ERPGranjita.API.Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<CompraProducto> ComprasProductos { get; set; }
+        public DbSet<Rubro> Rubro { get; set; }
+
         public DbSet<Venta> Ventas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +28,11 @@ namespace ERPGranjita.API.Data
                 .HasOne(cp => cp.Proveedor)
                 .WithMany(p => p.Compras)
                 .HasForeignKey(cp => cp.ProveedorId);
+
+            modelBuilder.Entity<Proveedor>()
+                .HasOne(p => p.Rubro)
+                .WithMany()
+                .HasForeignKey(p => p.RubroId);
         }
     }
 }

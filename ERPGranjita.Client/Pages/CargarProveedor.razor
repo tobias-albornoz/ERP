@@ -2,22 +2,35 @@
 @inject HttpClient Http
 
 <h3>Proveedores</h3>
-
 <EditForm Model="@nuevoProveedor" OnValidSubmit="GuardarProveedor" class="mb-4">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label class="form-label">Nombre</label>
             <InputText @bind-Value="nuevoProveedor.Nombre" class="form-control" />
         </div>
-        <div class="col-md-3">
-            <label class="form-label">Contacto</label>
-            <InputText @bind-Value="nuevoProveedor.Contacto" class="form-control" />
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label">Teléfono</label>
             <InputText @bind-Value="nuevoProveedor.Telefono" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">CUIT</label>
+            <InputText @bind-Value="nuevoProveedor.CUIT" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Dirección</label>
+            <InputText @bind-Value="nuevoProveedor.Direccion" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Rubro</label>
+            <InputSelect @bind-Value="nuevoProveedor.RubroId" class="form-control">
+                <option value="">Seleccione...</option>
+                @foreach (var rubro in rubros)
+                {
+                    <option value="@rubro.Id">@rubro.Nombre</option>
+                }
+            </InputSelect>
         </div>
         <div class="col-md-2 d-grid">
             <button type="submit" class="btn btn-primary" disabled="@isSaving">
@@ -49,9 +62,10 @@ else
         <thead class="table-dark">
             <tr>
                 <th>Nombre</th>
-                <th>Contacto</th>
                 <th>Teléfono</th>
-                <th>Compras</th>
+                <th>CUIT</th>
+                <th>Dirección</th>
+                <th>Rubro</th>
             </tr>
         </thead>
         <tbody>
@@ -59,9 +73,10 @@ else
             {
                 <tr>
                     <td>@p.Nombre</td>
-                    <td>@p.Contacto</td>
                     <td>@p.Telefono</td>
-                    <td>@p.Compras?.Count ?? 0</td>
+                    <td>@p.CUIT</td>
+                    <td>@p.Direccion</td>
+                    <td>@p.Rubro?.Nombre</td>
                 </tr>
             }
         </tbody>
@@ -75,8 +90,11 @@ else
     private string mensaje = "";
     private string errorMensaje = "";
 
+    private List<Rubro> rubros = new();
+
     protected override async Task OnInitializedAsync()
     {
+        await CargarRubros();
         await CargarProveedores();
     }
 
@@ -118,4 +136,17 @@ else
             errorMensaje = "Error al cargar proveedores desde la API.";
         }
     }
+
+    private async Task CargarRubros()
+    {
+        try
+        {
+            rubros = await Http.GetFromJsonAsync<List<Rubro>>("api/rubros") ?? new();
+        }
+        catch
+        {
+            rubros = new List<Rubro>();
+        }
+    }
+
 }

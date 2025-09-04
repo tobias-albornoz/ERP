@@ -10,7 +10,7 @@ namespace ERPGranjita.API.Repositories
         public ProveedoresRepository(CarniceriaDbContext context) => _context = context;
 
         public async Task<List<Proveedor>> GetAllAsync() =>
-            await _context.Proveedores.ToListAsync();
+            await _context.Proveedores.Include(p => p.Rubro).ToListAsync();
 
         public async Task<Proveedor?> GetByIdAsync(int id) =>
             await _context.Proveedores.Include(p => p.Compras).ThenInclude(c => c.Producto)
