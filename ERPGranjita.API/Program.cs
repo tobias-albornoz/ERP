@@ -24,6 +24,8 @@ builder.Services.AddScoped<ERPGranjita.API.Repositories.RubroRepository>();
 builder.Services.AddScoped<ERPGranjita.API.Services.RubroService>();
 builder.Services.AddScoped<ERPGranjita.API.Repositories.UnidadMedidaRepository>();
 builder.Services.AddScoped<ERPGranjita.API.Services.UnidadMedidaService>();
+builder.Services.AddScoped<ERPGranjita.API.Repositories.ComprasRepository>();
+builder.Services.AddScoped<ERPGranjita.API.Services.ComprasService>();
 
 // --- HABILITAR CORS ---
 builder.Services.AddCors(options =>

@@ -22,6 +22,6 @@ namespace ERPGranjita.Shared.Models
         public int RubroId { get; set; }
         public Rubro? Rubro { get; set; } // Si tienes navegación
 
-        public List<CompraProducto> Compras { get; set; } = new();
+        public List<Compra> Compras { get; set; } = new();
     }
 }

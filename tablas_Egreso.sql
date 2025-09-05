@@ -54,7 +54,7 @@ CREATE TABLE Compra (
     estado INT,
     total DECIMAL(18,2),
     comentarios NVARCHAR(255),
-    FOREIGN KEY (proveedorId) REFERENCES Proveedor(id)
+    FOREIGN KEY (proveedorId) REFERENCES Proveedores(id)
     --FOREIGN KEY (estado) REFERENCES Estado(id)
 );
 
