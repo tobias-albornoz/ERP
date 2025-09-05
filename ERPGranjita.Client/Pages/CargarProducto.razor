@@ -17,7 +17,23 @@
     </div>
     <div class="mb-3">
         <label>Unidad de Medida</label>
-        <InputText @bind-Value="producto.UnidadMedida" class="form-control" />
+        <InputSelect @bind-Value="producto.UnidadMedidaId" class="form-control">
+            <option value="">Seleccione...</option>
+            @foreach (var unidad in unidadesMedida)
+            {
+                <option value="@unidad.Id">@unidad.Descripcion</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="mb-3">
+        <label>Rubro</label>
+        <InputSelect @bind-Value="producto.RubroId" class="form-control">
+            <option value="">Seleccione...</option>
+            @foreach (var rubro in rubros)
+            {
+                <option value="@rubro.Id">@rubro.Nombre</option>
+            }
+        </InputSelect>
     </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
 </EditForm>
@@ -31,6 +47,15 @@
     private Producto producto = new();
     private string mensaje = "";
 
+    private List<UnidadMedida> unidadesMedida = new();
+    private List<Rubro> rubros = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUnidadesMedida();
+        await CargarRubros();
+    }
+
     private async Task GuardarProducto()
     {
         var response = await Http.PostAsJsonAsync("api/productos", producto);
@@ -43,5 +68,15 @@
         {
             mensaje = "Error al guardar el producto.";
         }
+    }
+
+    private async Task CargarUnidadesMedida()
+    {
+        unidadesMedida = await Http.GetFromJsonAsync<List<UnidadMedida>>("api/unidadesmedida") ?? new();
+    }
+
+    private async Task CargarRubros()
+    {
+        rubros = await Http.GetFromJsonAsync<List<Rubro>>("api/rubros") ?? new();
     }
 }

@@ -9,9 +9,13 @@ namespace ERPGranjita.Shared.Models
         [Required, StringLength(100)]
         public string Nombre { get; set; } = string.Empty;
 
-        [StringLength(100)]
-        public string? UnidadMedida { get; set; }
-
         public string? Descripcion { get; set; }
+
+        public int UnidadMedidaId { get; set; }
+
+        public int RubroId { get; set; }
+
+        public Rubro? Rubro { get; set; }
+        public UnidadMedida? UnidadMedida { get; set; }
     }
 }

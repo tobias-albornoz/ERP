@@ -14,6 +14,7 @@ namespace ERPGranjita.API.Data
         public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<CompraProducto> ComprasProductos { get; set; }
         public DbSet<Rubro> Rubro { get; set; }
+        public DbSet<UnidadMedida> UnidadMedida { get; set; }
 
         public DbSet<Venta> Ventas { get; set; }
 
@@ -33,6 +34,18 @@ namespace ERPGranjita.API.Data
                 .HasOne(p => p.Rubro)
                 .WithMany()
                 .HasForeignKey(p => p.RubroId);
+
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.UnidadMedida)
+                .WithMany()
+                .HasForeignKey(p => p.UnidadMedidaId);
+
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Rubro)
+                .WithMany()
+                .HasForeignKey(p => p.RubroId);
+
+
         }
     }
 }
