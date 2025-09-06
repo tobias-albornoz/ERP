@@ -1,0 +1,216 @@
+﻿@page "/egresos/compra"
+@inject HttpClient Http
+@layout ERPGranjita.Client.Pages.Egresos.EgresosLayout
+
+<style>
+    .compra-card {
+        max-width: 1100px;
+        width: 100%;
+        border-radius: 2rem;
+        box-shadow: 0 6px 32px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.10);
+        background: #fff;
+        padding: 2.5rem 2rem;
+        margin: 2rem auto;
+    }
+
+    .compra-header {
+        color: #C80000;
+    }
+
+    .compra-card .form-label {
+        font-weight: 600;
+        color: #C80000;
+    }
+
+    .compra-card .form-control, .compra-card .form-select {
+        border-radius: 0.75rem;
+        font-size: 1.05rem;
+    }
+
+    .compra-card .card-header {
+        background: linear-gradient(90deg, #C80000 0%, #FF6A12 100%);
+        color: #fff;
+        border-radius: 1rem 1rem 0 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .compra-card .btn-light {
+        color: #C80000;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+
+        .compra-card .btn-light:hover {
+            background: #FF6A12;
+            color: #fff;
+        }
+
+    .compra-card .btn-primary {
+        background: linear-gradient(90deg, #C80000 0%, #FF6A12 100%);
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(200,0,0,0.08);
+        transition: background 0.2s;
+    }
+
+        .compra-card .btn-primary:hover {
+            background: #FF6A12;
+        }
+
+    .compra-card .badge.bg-success {
+        font-size: 1.2rem;
+        padding: 0.7em 1.2em;
+        border-radius: 1rem;
+    }
+
+    @@media (max-width: 767px) {
+        .compra-card
+
+    {
+        padding: 1rem 0.5rem;
+    }
+
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="compra-card">
+        <div class="text-center mb-4">
+            <h2 class="mb-3 compra-header">
+                <i class="bi bi-cart-plus"></i> Cargar Compra
+            </h2>
+            <p class="lead mb-4">Registra una nueva compra de productos.</p>
+        </div>
+        <EditForm Model="@compra" OnValidSubmit="GuardarCompra">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row mb-3">
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <label class="form-label">Proveedor</label>
+                    <InputSelect @bind-Value="compra.ProveedorId" class="form-select">
+                        <option value="">Seleccione un proveedor</option>
+                        @foreach (var proveedor in proveedores)
+                        {
+                            <option value="@proveedor.Id">@proveedor.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <label class="form-label">Fecha</label>
+                    <InputDate @bind-Value="compra.Fecha" class="form-control" />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Comentarios</label>
+                    <InputText @bind-Value="compra.Comentarios" class="form-control" />
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-list-ul"></i> Detalles de la compra</span>
+                    <button type="button" class="btn btn-light btn-sm" @onclick="AgregarDetalle">
+                        <i class="bi bi-plus-circle"></i> Agregar Detalle
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30%">Producto</th>
+                                <th style="width: 15%">Cantidad</th>
+                                <th style="width: 20%">Precio Unitario</th>
+                                <th style="width: 20%">Subtotal</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (compra.Detalles.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-secondary">Agregue al menos un producto</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var detalle in compra.Detalles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <InputSelect @bind-Value="detalle.ProductoId" class="form-select">
+                                                <option value="">Seleccione...</option>
+                                                @foreach (var producto in productos)
+                                                {
+                                                    <option value="@producto.Id">@producto.Nombre</option>
+                                                }
+                                            </InputSelect>
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="detalle.Cantidad" class="form-control" min="1" />
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="detalle.PrecioUnitario" class="form-control" min="0" step="0.01" />
+                                        </td>
+                                        <td>
+                                            <span>$@(detalle.Cantidad* detalle.PrecioUnitario)</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger" title="Quitar" @onclick="@(() => QuitarDetalle(detalle))">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-3">
+                <h5>Total: <span class="badge bg-success">$@compra.Detalles.Sum(d => d.Cantidad * d.PrecioUnitario)</span></h5>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save"></i> Guardar Compra
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Compra compra = new() { Fecha = DateTime.Now, Detalles = new List<DetalleDeCompra>() };
+    private List<Proveedor> proveedores = new();
+    private List<Producto> productos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        proveedores = await Http.GetFromJsonAsync<List<Proveedor>>("api/proveedores") ?? new();
+        productos = await Http.GetFromJsonAsync<List<Producto>>("api/productos") ?? new();
+    }
+
+    private void AgregarDetalle()
+    {
+        compra.Detalles.Add(new DetalleDeCompra());
+    }
+
+    private void QuitarDetalle(DetalleDeCompra detalle)
+    {
+        compra.Detalles.Remove(detalle);
+    }
+
+    private async Task GuardarCompra()
+    {
+        compra.Total = compra.Detalles.Sum(d => d.Cantidad * d.PrecioUnitario);
+        var response = await Http.PostAsJsonAsync("api/compras", compra);
+        if (response.IsSuccessStatusCode)
+        {
+            compra = new() { Fecha = DateTime.Now, Detalles = new List<DetalleDeCompra>() };
+        }
+    }
+}

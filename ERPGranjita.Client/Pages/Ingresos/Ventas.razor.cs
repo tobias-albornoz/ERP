@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
-namespace ERPGranjita.Client.Pages
+namespace ERPGranjita.Client.Pages.Ingresos
 {
     public partial class Ventas : ComponentBase
     {

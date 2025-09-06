@@ -1,0 +1,73 @@
+﻿@page "/"
+
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="d-flex justify-content-center align-items-center min-vh-100" >
+    <div class="card shadow-lg p-4" style="max-width: 900px; width: 100%; border-radius: 2rem;">
+        <div class="text-center mb-4">
+            <h1 class="mb-3" style="color: #C80000;">Bienvenido a ERP Granjita</h1>
+            <p class="lead mb-4">Selecciona el módulo al que deseas ingresar:</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card card-marca rojo text-center h-100" @onclick="() => ShowModal('e')" style="cursor:pointer;">
+                    <div class="card-body">
+                        <i class="bi bi-box-arrow-down-left display-4"></i>
+                        <h3 class="card-title mt-3">Egresos</h3>
+                        <p class="card-text">Compras, gastos y pagos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-marca naranja text-center h-100" @onclick="() => ShowModal('p')" style="cursor:pointer;">
+                    <div class="card-body">
+                        <i class="bi bi-box-seam display-4"></i>
+                        <h3 class="card-title mt-3">Productos</h3>
+                        <p class="card-text">Gestión de productos y stock.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-marca amarillo text-center h-100" @onclick="() => ShowModal('i')" style="cursor:pointer;">
+                    <div class="card-body">
+                        <i class="bi bi-box-arrow-up-right display-4"></i>
+                        <h3 class="card-title mt-3">Ingresos</h3>
+                        <p class="card-text">Ventas y cobros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private bool showModal = false;
+    private char modalModule;
+    private string modalTitle = "";
+
+    private void ShowModal(char module)
+    {
+        modalModule = module;
+        modalTitle = module switch
+        {
+            'e' => "Módulo de Egresos",
+            'p' => "Módulo de Productos",
+            'i' => "Módulo de Ingresos",
+            _ => ""
+        };
+        NavigateToModule();
+    }
+
+    [Inject] NavigationManager Navigation { get; set; } = default!;
+
+    private void NavigateToModule()
+    {
+        if (modalModule == 'e')
+            Navigation.NavigateTo("/egresos");
+        else if (modalModule == 'p')
+            Navigation.NavigateTo("/producto");
+        else if (modalModule == 'i')
+            Navigation.NavigateTo("/ingresos");
+    }
+}

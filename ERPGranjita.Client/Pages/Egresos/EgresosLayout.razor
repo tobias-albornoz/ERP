@@ -1,0 +1,112 @@
+﻿@inherits LayoutComponentBase
+
+<style>
+    .egresos-sidebar {
+        background: linear-gradient(180deg, #C80000 0%, #FF6A12 100%);
+        min-height: 100vh;
+        color: #fff;
+        box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+    }
+
+        .egresos-sidebar .nav-link {
+            color: #fff;
+            font-size: 1.1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, color 0.2s;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+            .egresos-sidebar .nav-link.active,
+            .egresos-sidebar .nav-link:hover {
+                background: #FFFF00;
+                color: #C80000 !important;
+                font-weight: 600;
+            }
+
+        /* Enlace especial para Menú Principal */
+        .egresos-sidebar .nav-link-menu {
+            background: #fff !important;
+            color: #C80000 !important;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            border: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            width: 100%;
+            text-align: left;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            letter-spacing: 0.5px;
+        }
+
+            .egresos-sidebar .nav-link-menu:hover,
+            .egresos-sidebar .nav-link-menu:focus,
+            .egresos-sidebar .nav-link-menu:active {
+                background: #FF6A12 !important;
+                color: #fff !important;
+            }
+
+        .egresos-sidebar h5 {
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+    .egresos-content-card {
+        background: #fff;
+        border-radius: 1.5rem;
+        box-shadow: 0 6px 32px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.10);
+        padding: 2.5rem 2rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        min-height: 80vh;
+    }
+
+    @@media (max-width: 767px) {
+        .egresos-content-card {
+            padding: 1rem 0.5rem;
+        }
+
+        .egresos-sidebar {
+            min-height: auto;
+        }
+    }
+</style>
+
+<div class="row min-vh-100 g-0">
+    <div class="col-12 col-md-3 col-lg-2 egresos-sidebar d-flex flex-column align-items-center py-4 px-2">
+        <h5 class="mb-4 text-center">
+            <i class="bi bi-box-arrow-down-left display-6"></i>
+            <span class="d-block mt-2" style="font-size:1.2rem;">Egresos</span>
+        </h5>
+        <NavLink class="nav-link" href="/egresos" activeClass="active" Match="NavLinkMatch.All">
+            <i class="bi bi-house-door-fill"></i> Inicio
+        </NavLink>
+        <NavLink class="nav-link" href="/egresos/compra" activeClass="active">
+            <i class="bi bi-cart-plus-fill"></i> Cargar Compra
+        </NavLink>
+        <NavLink class="nav-link" href="/egresos/proveedores" activeClass="active">
+            <i class="bi bi-person-lines-fill"></i> Proveedores
+        </NavLink>
+
+        <div class="flex-grow-1"></div>
+        <NavLink class="nav-link nav-link-menu" href="/">
+            <i class="bi bi-arrow-left-circle"></i> Menú Principal
+        </NavLink>
+
+        <div class="mb-2 small text-center" style="opacity:0.7;">
+            <i class="bi bi-c-circle"></i> ERP Granjita
+        </div>
+    </div>
+    <div class="col p-0 justify-content-center ">
+        @Body
+    </div>
+</div>
