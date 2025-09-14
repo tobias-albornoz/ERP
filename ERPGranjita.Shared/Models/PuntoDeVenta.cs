@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ERPGranjita.Shared.Models
 {
-    public class FormaPago
+    public class PuntoDeVenta
     {
         public int Id { get; set; }
 
@@ -16,5 +12,6 @@ namespace ERPGranjita.Shared.Models
 
         [StringLength(255)]
         public string? Descripcion { get; set; }
+
     }
 }

@@ -1,4 +1,4 @@
--- Tabla: PuntoDeVenta
+﻿-- Tabla: PuntoDeVenta
 CREATE TABLE PuntoDeVenta (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100),
@@ -16,7 +16,9 @@ CREATE TABLE FormaPago (
 CREATE TABLE VentaDiaria (
     id INT IDENTITY(1,1) PRIMARY KEY,
     fecha DATE,
-    saldo DECIMAL(18,2),
+    saldoInicial DECIMAL(18,2),
+    saldoFinal DECIMAL(18,2),
+    TotalBalanzas DECIMAL(18,2),
     comentarios NVARCHAR(255)
 );
 
@@ -41,7 +43,7 @@ CREATE TABLE TicketError (
     FOREIGN KEY (ventaDiariaId) REFERENCES VentaDiaria(id)
 );
 
--- Tabla: Se�ia
+-- Tabla: Señia
 CREATE TABLE Senia (
     id INT IDENTITY(1,1) PRIMARY KEY,
     ventaDiariaId INT,

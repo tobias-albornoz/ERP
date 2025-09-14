@@ -1,0 +1,481 @@
+﻿@page "/ingresos/venta"
+@inject HttpClient Http
+
+<style>
+    .ingreso-card {
+        max-width: 1100px;
+        width: 100%;
+        border-radius: 2rem;
+        box-shadow: 0 6px 32px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.10);
+        background: #fff;
+        padding: 2.5rem 2rem;
+        margin: 2rem auto;
+    }
+
+    .ingreso-header {
+        color: #C80000;
+    }
+
+    .ingreso-card .form-label {
+        font-weight: 600;
+        color: #C80000;
+    }
+
+    .ingreso-card .form-control, .ingreso-card .form-select {
+        border-radius: 0.75rem;
+        font-size: 1.05rem;
+    }
+
+    .ingreso-card .card-header {
+        background: linear-gradient(90deg, #C80000 0%, #FF6A12 100%);
+        color: #fff;
+        border-radius: 1rem 1rem 0 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .ingreso-card .btn-light {
+        color: #C80000;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+
+        .ingreso-card .btn-light:hover {
+            background: #FF6A12;
+            color: #fff;
+        }
+
+    .ingreso-card .btn-primary {
+        background: linear-gradient(90deg, #C80000 0%, #FF6A12 100%);
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(200,0,0,0.08);
+        transition: background 0.2s;
+    }
+
+        .ingreso-card .btn-primary:hover {
+            background: #FF6A12;
+        }
+
+    .ingreso-card .badge.bg-success {
+        font-size: 1.2rem;
+        padding: 0.7em 1.2em;
+        border-radius: 1rem;
+    }
+
+    @@media (max-width: 767px) {
+        .ingreso-card {
+            padding: 1rem 0.5rem;
+        }
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="ingreso-card">
+        <div class="text-center mb-4">
+            <h2 class="mb-3 ingreso-header">
+                <i class="bi bi-cash-coin"></i> Cargar Ingreso Diario
+            </h2>
+            <p class="lead mb-4">Registra un nuevo cierre de ventas diario y sus componentes.</p>
+        </div>
+        <EditForm Model="@venta" OnValidSubmit="GuardarVenta">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row mb-3">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <label class="form-label">Fecha</label>
+                    <InputDate @bind-Value="venta.Fecha" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <label class="form-label">Saldo</label>
+                    <InputNumber @bind-Value="venta.SaldoInicial" class="form-control" min="0" step="0.01" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Comentarios</label>
+                    <InputText @bind-Value="venta.Comentarios" class="form-control" />
+                </div>
+            </div>
+
+            <!-- Detalles de la venta -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-list-ul"></i> Detalles de la venta</span>
+                    <button type="button" class="btn btn-light btn-sm" @onclick="AgregarDetalle">
+                        <i class="bi bi-plus-circle"></i> Agregar Detalle
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 35%">Forma de Pago</th>
+                                <th style="width: 25%">Monto</th>
+                                <th style="width: 30%">Comentarios</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (venta.DetallesVentaDiaria.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-secondary">Agregue al menos un detalle</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var detalle in venta.DetallesVentaDiaria)
+                                {
+                                    <tr>
+                                        <td>
+                                            <InputSelect @bind-Value="detalle.FormaPagoId" class="form-select">
+                                                <option value="">Seleccione...</option>
+                                                @foreach (var fp in formasPago)
+                                                {
+                                                    <option value="@fp.Id">@fp.Nombre</option>
+                                                }
+                                            </InputSelect>
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="detalle.Monto" class="form-control" min="0" step="0.01" />
+                                        </td>
+                                        <td>
+                                            <InputText @bind-Value="detalle.Comentarios" class="form-control" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger" title="Quitar" @onclick="@(() => QuitarDetalle(detalle))">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TicketError -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-exclamation-triangle"></i> Tickets con Error</span>
+                    <button type="button" class="btn btn-light btn-sm" @onclick="AgregarTicketError">
+                        <i class="bi bi-plus-circle"></i> Agregar Ticket Error
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%">Fecha</th>
+                                <th style="width: 25%">Monto</th>
+                                <th style="width: 40%">Comentarios</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (venta.TicketsError.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-secondary">Sin tickets con error</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var ticket in venta.TicketsError)
+                                {
+                                    <tr>
+                                        <td>
+                                            <InputDate @bind-Value="ticket.Fecha" class="form-control" />
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="ticket.Monto" class="form-control" min="0" step="0.01" />
+                                        </td>
+                                        <td>
+                                            <InputText @bind-Value="ticket.Comentarios" class="form-control" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger" title="Quitar" @onclick="@(() => QuitarTicketError(ticket))">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Señias -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cash-stack"></i> Señas</span>
+                    <button type="button" class="btn btn-light btn-sm" @onclick="AgregarSenia">
+                        <i class="bi bi-plus-circle"></i> Agregar Seña
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%">Fecha</th>
+                                <th style="width: 25%">Monto</th>
+                                <th style="width: 40%">Comentarios</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (venta.Senias.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-secondary">Sin señias registradas</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var senia in venta.Senias)
+                                {
+                                    <tr>
+                                        <td>
+                                            <InputDate @bind-Value="senia.Fecha" class="form-control" />
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="senia.Monto" class="form-control" min="0" step="0.01" />
+                                        </td>
+                                        <td>
+                                            <InputText @bind-Value="senia.Comentarios" class="form-control" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger" title="Quitar" @onclick="@(() => QuitarSenia(senia))">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- Cierre de Balanza -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clipboard-check"></i> Cierres de Balanza</span>
+                    <button type="button" class="btn btn-light btn-sm" @onclick="AgregarCierreBalanza">
+                        <i class="bi bi-plus-circle"></i> Agregar Cierre
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 15%">Fecha</th>
+                                <th style="width: 20%">Punto de Venta</th>
+                                <th style="width: 15%">Cantidad Tickets</th>
+                                <th style="width: 20%">Total Vendido</th>
+                                <th style="width: 30%">Comentarios</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (venta.CierresDeBalanza.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-secondary">Sin cierres de balanza</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var cierre in venta.CierresDeBalanza)
+                                {
+                                    <tr>
+                                        <td>
+                                            <InputDate @bind-Value="cierre.Fecha" class="form-control" />
+                                        </td>
+                                        <td>
+                                            <InputSelect @bind-Value="cierre.PuntoVentaId" class="form-select">
+                                                <option value="">Seleccione...</option>
+                                                @foreach (var pv in puntosDeVenta)
+                                                {
+                                                    <option value="@pv.Id">@pv.Nombre</option>
+                                                }
+                                            </InputSelect>
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="cierre.CantidadTickets" class="form-control" min="0" />
+                                        </td>
+                                        <td>
+                                            <InputNumber @bind-Value="cierre.TotalVendido" class="form-control" min="0" step="0.01" />
+                                        </td>
+                                        <td>
+                                            <InputText @bind-Value="cierre.Comentarios" class="form-control" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger" title="Quitar" @onclick="@(() => QuitarCierreBalanza(cierre))">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4 mb-2">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body py-3">
+                            <div class="mb-2">
+                                <i class="bi bi-cash-coin" style="font-size: 2rem; color: #C80000;"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Total Ingresos</h6>
+                            <span class="badge bg-success fs-5 px-4 py-2">$@venta.CalcularSaldoFinal()</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body py-3">
+                            <div class="mb-2">
+                                <i class="bi bi-graph-up-arrow" style="font-size: 2rem; color: #FF6A12;"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Total Ventas</h6>
+                            <span class="badge bg-success fs-5 px-4 py-2">$@venta.CalcularTotalBalanzas()</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body py-3">
+                            <div class="mb-2">
+                                <i class="bi bi-calculator" style="font-size: 2rem; color: #C80000;"></i>
+                            </div>
+                            <h6 class="text-muted mb-1">Diferencia</h6>
+                            <span class="badge bg-success fs-5 px-4 py-2">$@venta.CalcularDiferencia()</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save"></i> Guardar Ingreso
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<!-- Tabla de ingresos realizados -->
+@* <div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-ul"></i> Ingresos realizados</span>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered table-sm mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Saldo</th>
+                    <th>Total Detalles</th>
+                    <th>Comentarios</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ventasRealizadas == null)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary">Cargando...</td>
+                    </tr>
+                }
+                else if (!ventasRealizadas.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary">No hay ingresos registrados.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var v in ventasRealizadas)
+                    {
+                        <tr>
+                            <td>@v.Id</td>
+                            <td>@v.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>$@v.SaldoFinal</td>
+                            <td>$@v.DetallesVentaDiaria?.Sum(d => d.Monto)</td>
+                            <td>@v.Comentarios</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div> *@
+
+@code {
+    private VentaDiaria venta = new()
+    {
+        Fecha = DateTime.Now,
+        DetallesVentaDiaria = new List<DetalleVentaDiaria>(),
+        TicketsError = new List<TicketError>(),
+        Senias = new List<Senia>(),
+        CierresDeBalanza = new List<CierreDeBalanza>()
+    };
+
+    private List<FormaPago> formasPago = new();
+    private List<PuntoDeVenta> puntosDeVenta = new();
+    private List<VentaDiaria>? ventasRealizadas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        formasPago = await Http.GetFromJsonAsync<List<FormaPago>>("api/formaspago") ?? new();
+        puntosDeVenta = await Http.GetFromJsonAsync<List<PuntoDeVenta>>("api/puntosdeventa") ?? new();
+        // ventasRealizadas = await Http.GetFromJsonAsync<List<VentaDiaria>>("api/ventasdiarias") ?? new();
+    }
+
+    // Detalles de venta
+    private void AgregarDetalle() => venta.DetallesVentaDiaria.Add(new DetalleVentaDiaria());
+    private void QuitarDetalle(DetalleVentaDiaria detalle) => venta.DetallesVentaDiaria.Remove(detalle);
+
+    // TicketError
+    private void AgregarTicketError() => venta.TicketsError.Add(new TicketError { Fecha = DateTime.Now });
+    private void QuitarTicketError(TicketError ticket) => venta.TicketsError.Remove(ticket);
+
+    // Senia
+    private void AgregarSenia() => venta.Senias.Add(new Senia { Fecha = DateTime.Now });
+    private void QuitarSenia(Senia senia) => venta.Senias.Remove(senia);
+
+    // Cierre de Balanza
+    private void AgregarCierreBalanza() => venta.CierresDeBalanza.Add(new CierreDeBalanza { Fecha = DateTime.Now });
+    private void QuitarCierreBalanza(CierreDeBalanza cierre) => venta.CierresDeBalanza.Remove(cierre);
+
+    private async Task GuardarVenta()
+    {
+        // Actualiza los valores calculados
+        venta.SaldoFinal = venta.CalcularSaldoFinal();
+        venta.TotalBalanzas = venta.CalcularTotalBalanzas();
+
+        var response = await Http.PostAsJsonAsync("api/ventasdiarias", venta);
+        if (response.IsSuccessStatusCode)
+        {
+            venta = new()
+            {
+                Fecha = DateTime.Now,
+                DetallesVentaDiaria = new List<DetalleVentaDiaria>(),
+                TicketsError = new List<TicketError>(),
+                Senias = new List<Senia>(),
+                CierresDeBalanza = new List<CierreDeBalanza>()
+            };
+            ventasRealizadas = await Http.GetFromJsonAsync<List<VentaDiaria>>("api/ventasdiarias") ?? new();
+            StateHasChanged();
+        }
+    }
+}
