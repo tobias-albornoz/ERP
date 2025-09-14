@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ERPGranjita.Shared.Models
@@ -10,6 +11,7 @@ namespace ERPGranjita.Shared.Models
     {
         public int Id { get; set; }
         public int CompraId { get; set; }
+        [JsonIgnore]
         public Compra? Compra { get; set; }
         public DateTime Fecha { get; set; }
         public int FormaPagoId { get; set; }

@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ERPGranjita.Shared.Models
 {
@@ -20,8 +21,9 @@ namespace ERPGranjita.Shared.Models
         public string? CUIT { get; set; }
 
         public int RubroId { get; set; }
-        public Rubro? Rubro { get; set; } // Si tienes navegaci�n
+        public Rubro? Rubro { get; set; } // Si tienes navegación
 
+        [JsonIgnore]
         public List<Compra> Compras { get; set; } = new();
     }
 }

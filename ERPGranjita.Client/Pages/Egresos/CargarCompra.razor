@@ -67,12 +67,9 @@
     }
 
     @@media (max-width: 767px) {
-        .compra-card
-
-    {
-        padding: 1rem 0.5rem;
-    }
-
+        .compra-card {
+            padding: 1rem 0.5rem;
+        }
     }
 </style>
 
@@ -183,15 +180,65 @@
     </div>
 </div>
 
+<!-- Tabla de compras realizadas -->
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-ul"></i> Compras realizadas</span>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered table-sm mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Comentarios</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (comprasRealizadas == null)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary">Cargando...</td>
+                    </tr>
+                }
+                else if (!comprasRealizadas.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-secondary">No hay compras registradas.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var c in comprasRealizadas)
+                    {
+                        <tr>
+                            <td>@c.Id</td>
+                            <td>@(c.Proveedor?.Nombre ?? "N/A")</td>
+                            <td>@c.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>$@c.Total</td>
+                            <td>@c.Comentarios</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @code {
     private Compra compra = new() { Fecha = DateTime.Now, Detalles = new List<DetalleDeCompra>() };
     private List<Proveedor> proveedores = new();
     private List<Producto> productos = new();
+    private List<Compra>? comprasRealizadas;
 
     protected override async Task OnInitializedAsync()
     {
         proveedores = await Http.GetFromJsonAsync<List<Proveedor>>("api/proveedores") ?? new();
         productos = await Http.GetFromJsonAsync<List<Producto>>("api/productos") ?? new();
+        comprasRealizadas = await Http.GetFromJsonAsync<List<Compra>>("api/compras") ?? new();
     }
 
     private void AgregarDetalle()
@@ -211,6 +258,7 @@
         if (response.IsSuccessStatusCode)
         {
             compra = new() { Fecha = DateTime.Now, Detalles = new List<DetalleDeCompra>() };
+            StateHasChanged();
         }
     }
 }
